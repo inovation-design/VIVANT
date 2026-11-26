@@ -1229,6 +1229,92 @@
       font-size: 11.4px;
       line-height: 1.45;
     }
+
+    /* ==================== 6. GRAND FINALE CINEMATIC PHOTO FADE-IN ==================== */
+    .finale-photo-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 95;
+      background: radial-gradient(circle at center, rgba(12, 16, 28, 0.94) 0%, rgba(2, 4, 10, 0.99) 100%);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 2.2s cubic-bezier(0.22, 1, 0.36, 1), visibility 2.2s ease;
+    }
+    .finale-photo-overlay.visible {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+    .finale-photo-stage {
+      width: 100%;
+      max-width: 1040px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .finale-photo-frame {
+      position: relative;
+      width: 100%;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(244, 63, 94, 0.45);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.85), 0 0 48px rgba(220, 38, 38, 0.22);
+      background: #000000;
+    }
+    .finale-photo-img {
+      display: block;
+      width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+      background: #ffffff;
+      opacity: 0;
+      transform: scale(1.045);
+      transition: opacity 2.4s cubic-bezier(0.22, 1, 0.36, 1) 0.25s, transform 3.2s cubic-bezier(0.16, 1, 0.3, 1) 0.25s;
+    }
+    .finale-photo-overlay.visible .finale-photo-img {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .finale-photo-fallback {
+      display: none;
+      padding: 44px 24px;
+      text-align: center;
+      background: linear-gradient(160deg, #0b1324 0%, #170812 100%);
+      color: var(--text-primary);
+    }
+    .finale-photo-fallback.show {
+      display: block;
+    }
+    .finale-photo-caption {
+      text-align: center;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 1.4s ease 1.1s, transform 1.4s ease 1.1s;
+    }
+    .finale-photo-overlay.visible .finale-photo-caption {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .finale-photo-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 4px;
+      opacity: 0;
+      transition: opacity 1.2s ease 1.6s;
+    }
+    .finale-photo-overlay.visible .finale-photo-actions {
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
@@ -1556,10 +1642,10 @@
         📡 MESSAGES FROM ALLIES // 仲間たちからの通信記録
       </div>
       <div id="dossier-quotes" class="quotes-box"></div>
-
-      <div class="m-btn-stack" style="flex-direction:row;">
-        <button id="btn-dossier-s1" type="button" class="btn-secondary" style="flex:1;">Stage 1 から遊ぶ</button>
-        <button id="btn-dossier-close" type="button" class="btn-primary" style="flex:1;">ワークステーションへ戻る</button>
+      <div class="m-btn-stack" style="flex-direction:row; flex-wrap:wrap;">
+        <button id="btn-dossier-finale-img" type="button" class="btn-secondary" style="flex:1; min-width:150px; border-color:rgba(244,63,94,0.55); color:#fecdd3;">🎬 エンディング画像</button>
+        <button id="btn-dossier-s1" type="button" class="btn-secondary" style="flex:1; min-width:130px;">Stage 1 から遊ぶ</button>
+        <button id="btn-dossier-close" type="button" class="btn-primary" style="flex:1; min-width:150px;">ワークステーションへ戻る</button>
       </div>
     </div>
   </div>
@@ -1634,6 +1720,56 @@
       <div class="m-btn-stack" style="margin-top:12px;">
         <button id="btn-dict-close" type="button" class="btn-primary">辞典を閉じてターミナルへ戻る</button>
       </div>
+    </div>
+  </div>
+
+  <audio id="finale-audio" src="vivant-finale-audio.mp3" preload="auto"></audio>
+
+  <!-- 6. Grand Finale Cinematic Photo Fade-In Overlay (vivant photo.jpg) -->
+  <div id="finale-photo-overlay" class="finale-photo-overlay" role="dialog" aria-modal="true" aria-label="VIVANT Grand Finale Visual">
+    <div class="finale-photo-stage">
+      <div class="finale-photo-frame">
+        <img
+          id="finale-photo-img"
+          class="finale-photo-img"
+          src="vivant photo.jpg"
+          alt="VIVANT Grand Finale"
+        />
+        <div id="finale-photo-fallback" class="finale-photo-fallback">
+          <div style="font-family:var(--font-mono); font-size:12px; color:#fda4af; font-weight:800; letter-spacing:0.08em;">
+            ALL 40 STAGES COMPLETE // GRAND FINALE VISUAL
+          </div>
+          <div style="font-size:20px; font-weight:900; color:#ffffff; margin-top:8px;">
+            画像ファイル <code>vivant photo.jpg</code> が見つかりませんでした
+          </div>
+          <p style="font-size:12.5px; color:#cbd5e1; margin-top:8px; line-height:1.6;">
+            このHTMLと同じフォルダに <code>vivant photo.jpg</code> を配置すると自動でフェードイン表示されます。<br />
+            今すぐ手元の画像を選択して表示することもできます。
+          </p>
+          <button id="btn-finale-pick-img" type="button" class="btn-primary" style="max-width:280px; margin:14px auto 0;">
+            🖼️ vivant photo.jpg を選択して表示
+          </button>
+        </div>
+      </div>
+
+      <div class="finale-photo-caption">
+        <div style="font-family:var(--font-mono); font-size:11px; font-weight:800; letter-spacing:0.16em; color:#fda4af;">
+          OPERATION VIVANT — ALL 24 EPISODES / 40 STAGES COMPLETE
+        </div>
+        <div style="font-size:15px; font-weight:800; color:#ffffff; margin-top:4px;">
+          全ミッション完全制覇おめでとうございます！
+        </div>
+      </div>
+
+      <div class="finale-photo-actions">
+        <button id="btn-finale-to-dossier" type="button" class="btn-primary" style="width:auto; padding:10px 22px;">
+          🏆 戦績・称号ドシエを見る
+        </button>
+        <button id="btn-finale-photo-close" type="button" class="btn-secondary" style="width:auto; padding:10px 18px;">
+          閉じる
+        </button>
+      </div>
+      <input id="finale-photo-picker" type="file" accept="image/*" style="display:none;" />
     </div>
   </div>
 
@@ -4389,6 +4525,7 @@
           if (!this.state.clearedIds.includes(st.stageId)) {
             this.state.clearedIds.push(st.stageId);
           }
+          const allStagesCleared = new Set(this.state.clearedIds).size === STAGES.length;
 
           const nextId = STAGE_BY_NUM.get(st.stageNumber + 1) || null;
           if (nextId && !this.state.unlockedIds.includes(nextId)) {
@@ -4410,11 +4547,13 @@
             if (termBox) termBox.scrollTop = termBox.scrollHeight;
           });
 
-          // Stage 40 (Final Stage): Grand Finale Symphony -> Smoothly open Grand Finale Dossier
-          if (st.stageNumber === 40 || !nextId) {
+          // Show the finale after all stages are cleared, or when Stage 40 is cleared for a preview.
+          if (allStagesCleared || st.stageNumber === 40) {
             se.grandFinaleSymphony();
             const finaleRow = this.log(
-              '>>> ALL 40 STAGES COMPLETE — 最終戦績・称号ドシエを自動展開中... [░░░░░░░░░░] 0%',
+              allStagesCleared
+                ? '>>> ALL 40 STAGES COMPLETE — エンディングビジュアルをフェードイン展開中... [░░░░░░░░░░] 0%'
+                : '>>> STAGE 40 CLEAR — エンディングビジュアル表示確認中... [░░░░░░░░░░] 0%',
               'c-handoff'
             );
             this.handoffRowEl = finaleRow;
@@ -4423,15 +4562,24 @@
             this.handoffIntervalId = setInterval(() => {
               step = Math.min(totalSteps, step + 1);
               const bar = '█'.repeat(step) + '░'.repeat(totalSteps - step);
-              finaleRow.textContent = `>>> ALL 40 STAGES COMPLETE — 最終戦績・称号ドシエを自動展開中... [${bar}] ${step * 10}%`;
+              finaleRow.textContent = `>>> ${allStagesCleared ? 'ALL 40 STAGES COMPLETE' : 'STAGE 40 CLEAR / PREVIEW'} — エンディングビジュアルをフェードイン展開中... [${bar}] ${step * 10}%`;
               const termBox = document.getElementById('terminal-log');
               if (termBox) termBox.scrollTop = termBox.scrollHeight;
             }, 165);
 
             this.autoAdvanceTimerId = setTimeout(() => {
               this.cancelAutoAdvance(false);
-              this.openDossierModal(true);
+              this.showFinalePhotoOverlay();
             }, 1800);
+            return;
+          }
+
+          // Stage 40 may be cleared before other stages because all stages are selectable.
+          // Keep the player in the current stage until the remaining stages are cleared.
+          if (!nextId) {
+            this.transitioningStage = false;
+            se.stageClear();
+            this.log(`>>> STAGE 40 CLEAR — 残り ${STAGES.length - new Set(this.state.clearedIds).size} ステージをクリアするとエンディング画像が表示されます。`, 'c-handoff');
             return;
           }
 
@@ -4511,6 +4659,39 @@
           });
 
           document.getElementById('modal-dossier').classList.add('open');
+        },
+
+        showFinalePhotoOverlay() {
+          const overlay = document.getElementById('finale-photo-overlay');
+          const img = document.getElementById('finale-photo-img');
+          const fb = document.getElementById('finale-photo-fallback');
+          if (!overlay) return;
+          const finaleAudio = document.getElementById('finale-audio');
+          if (finaleAudio) {
+            finaleAudio.pause();
+            finaleAudio.currentTime = 0;
+            const playback = finaleAudio.play();
+            if (playback && typeof playback.catch === 'function') playback.catch(() => {});
+          }
+          if (img && fb && img.complete && img.naturalWidth === 0) {
+            img.style.display = 'none';
+            fb.classList.add('show');
+          }
+          overlay.classList.remove('visible');
+          void overlay.offsetWidth;
+          requestAnimationFrame(() => {
+            overlay.classList.add('visible');
+          });
+        },
+
+        closeFinalePhotoOverlay() {
+          const overlay = document.getElementById('finale-photo-overlay');
+          if (overlay) overlay.classList.remove('visible');
+          const finaleAudio = document.getElementById('finale-audio');
+          if (finaleAudio) {
+            finaleAudio.pause();
+            finaleAudio.currentTime = 0;
+          }
         },
 
         renderHeaderAndTelemetry() {
@@ -4880,6 +5061,55 @@
 
       document.getElementById('btn-dossier-close').addEventListener('click', () => {
         document.getElementById('modal-dossier').classList.remove('open');
+      });
+
+      document.getElementById('btn-dossier-finale-img').addEventListener('click', () => {
+        document.getElementById('modal-dossier').classList.remove('open');
+        se.grandFinaleSymphony();
+        GAME.showFinalePhotoOverlay();
+      });
+
+      // Grand Finale Photo Overlay Controls & Local File Fallback
+      const finalePhotoImg = document.getElementById('finale-photo-img');
+      const finalePhotoFallback = document.getElementById('finale-photo-fallback');
+      const finalePhotoPicker = document.getElementById('finale-photo-picker');
+      let finaleObjectUrl = null;
+
+      finalePhotoImg.addEventListener('load', () => {
+        finalePhotoImg.style.display = 'block';
+        finalePhotoFallback.classList.remove('show');
+      });
+
+      finalePhotoImg.addEventListener('error', () => {
+        finalePhotoImg.style.display = 'none';
+        finalePhotoFallback.classList.add('show');
+      });
+
+      // スクリプト実行前に読み込み失敗していた場合も即座にフォールバックを表示
+      if (finalePhotoImg.complete && finalePhotoImg.naturalWidth === 0) {
+        finalePhotoImg.style.display = 'none';
+        finalePhotoFallback.classList.add('show');
+      }
+
+      document.getElementById('btn-finale-pick-img').addEventListener('click', () => {
+        finalePhotoPicker.click();
+      });
+
+      finalePhotoPicker.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        if (finaleObjectUrl) URL.revokeObjectURL(finaleObjectUrl);
+        finaleObjectUrl = URL.createObjectURL(file);
+        finalePhotoImg.src = finaleObjectUrl;
+      });
+
+      document.getElementById('btn-finale-to-dossier').addEventListener('click', () => {
+        GAME.closeFinalePhotoOverlay();
+        GAME.openDossierModal(true);
+      });
+
+      document.getElementById('btn-finale-photo-close').addEventListener('click', () => {
+        GAME.closeFinalePhotoOverlay();
       });
 
       document.getElementById('btn-dossier-s1').addEventListener('click', () => {
