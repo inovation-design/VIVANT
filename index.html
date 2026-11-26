@@ -1361,7 +1361,10 @@
 
   <div id="intro-overlay" class="intro-overlay" role="dialog" aria-modal="true" aria-label="VIVANT オープニング画面">
     <div class="intro-content">
-      <img class="intro-poster" src="vivant-season2-desert-visual.jpg" alt="VIVANT 新シリーズ キービジュアル" />
+      <img id="intro-poster" class="intro-poster" src="vivant-season2-desert-visual.jpg" alt="VIVANT 新シリーズ キービジュアル" />
+      <button id="btn-intro-audio" type="button" class="btn-secondary" style="display:none; width:auto; padding:9px 20px;">
+        🔊 オープニング曲を再生
+      </button>
       <button id="btn-intro-start" type="button" class="btn-primary" style="width:auto; padding:11px 32px; font-size:14px;">
         ゲームを開始
       </button>
@@ -4971,17 +4974,27 @@
 
       const cliInput = document.getElementById('cli-input');
       const introAudio = document.getElementById('intro-audio');
-      if (introAudio) {
-        const initialPlayback = introAudio.play();
-        if (initialPlayback && typeof initialPlayback.catch === 'function') initialPlayback.catch(() => {});
-      }
+      const introAudioButton = document.getElementById('btn-intro-audio');
+      const startIntroAudio = () => {
+        if (!introAudio || !introAudio.paused) return;
+        const playback = introAudio.play();
+        if (playback && typeof playback.then === 'function') {
+          playback.then(() => {
+            if (introAudioButton) introAudioButton.style.display = 'none';
+          }).catch(() => {
+            if (introAudioButton) introAudioButton.style.display = 'inline-flex';
+          });
+        }
+      };
+      const introPoster = document.getElementById('intro-poster');
+      if (introPoster && introPoster.complete) startIntroAudio();
+      else if (introPoster) introPoster.addEventListener('load', startIntroAudio, { once: true });
+      if (introAudio && !introAudio.paused && introAudioButton) introAudioButton.style.display = 'none';
+
+      introAudioButton.addEventListener('click', startIntroAudio);
 
       document.getElementById('btn-intro-start').addEventListener('click', () => {
         document.getElementById('intro-overlay').classList.add('dismissed');
-        if (introAudio && introAudio.paused) {
-          const playback = introAudio.play();
-          if (playback && typeof playback.catch === 'function') playback.catch(() => {});
-        }
         window.setTimeout(() => cliInput.focus({ preventScroll: true }), 700);
       });
 
