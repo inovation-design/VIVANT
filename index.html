@@ -1772,7 +1772,7 @@
   </div>
 
   <audio id="intro-audio" src="vivant-opening-audio.mp3" preload="auto" autoplay></audio>
-  <audio id="finale-audio" src="vivant-finale-audio.mp3" preload="auto"></audio>
+  <audio id="finale-audio" src="vivant-finale-audio.mp3" preload="auto" loop></audio>
 
   <!-- 6. Grand Finale Cinematic Photo Fade-In Overlay (vivant photo.jpg) -->
   <div id="finale-photo-overlay" class="finale-photo-overlay" role="dialog" aria-modal="true" aria-label="VIVANT Grand Finale Visual">
@@ -4719,8 +4719,7 @@
           const fb = document.getElementById('finale-photo-fallback');
           if (!overlay) return;
           const finaleAudio = document.getElementById('finale-audio');
-          if (finaleAudio) {
-            finaleAudio.pause();
+          if (finaleAudio && finaleAudio.paused) {
             finaleAudio.currentTime = 0;
             const playback = finaleAudio.play();
             if (playback && typeof playback.catch === 'function') playback.catch(() => {});
@@ -4739,11 +4738,6 @@
         closeFinalePhotoOverlay() {
           const overlay = document.getElementById('finale-photo-overlay');
           if (overlay) overlay.classList.remove('visible');
-          const finaleAudio = document.getElementById('finale-audio');
-          if (finaleAudio) {
-            finaleAudio.pause();
-            finaleAudio.currentTime = 0;
-          }
         },
 
         renderHeaderAndTelemetry() {
