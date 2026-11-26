@@ -1762,6 +1762,9 @@
       </div>
 
       <div class="finale-photo-actions">
+        <button id="btn-finale-share" type="button" class="btn-secondary" style="width:auto; padding:10px 18px; border-color:rgba(56,189,248,0.55); color:#bae6fd;">
+          📤 共有（Xなど）
+        </button>
         <button id="btn-finale-to-dossier" type="button" class="btn-primary" style="width:auto; padding:10px 22px;">
           🏆 戦績・称号ドシエを見る
         </button>
@@ -5106,6 +5109,25 @@
       document.getElementById('btn-finale-to-dossier').addEventListener('click', () => {
         GAME.closeFinalePhotoOverlay();
         GAME.openDossierModal(true);
+      });
+
+      document.getElementById('btn-finale-share').addEventListener('click', async () => {
+        const shareUrl = 'https://inovation-design.github.io/VIVANT/';
+        const shareData = {
+          title: 'VIVANT',
+          text: 'VIVANTの最終ステージをクリアしました！',
+          url: shareUrl
+        };
+        if (navigator.share) {
+          try {
+            await navigator.share(shareData);
+            return;
+          } catch (err) {
+            if (err && err.name === 'AbortError') return;
+          }
+        }
+        const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareData.text)}&url=${encodeURIComponent(shareUrl)}`;
+        window.open(xUrl, '_blank', 'noopener,noreferrer');
       });
 
       document.getElementById('btn-finale-photo-close').addEventListener('click', () => {
