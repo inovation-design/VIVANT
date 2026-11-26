@@ -1771,6 +1771,7 @@
     </div>
   </div>
 
+  <audio id="intro-audio" src="vivant-opening-audio.mp3" preload="auto" autoplay></audio>
   <audio id="finale-audio" src="vivant-finale-audio.mp3" preload="auto"></audio>
 
   <!-- 6. Grand Finale Cinematic Photo Fade-In Overlay (vivant photo.jpg) -->
@@ -4975,9 +4976,18 @@
       GAME.loadStage(GAME.state.currentStageId, false);
 
       const cliInput = document.getElementById('cli-input');
+      const introAudio = document.getElementById('intro-audio');
+      if (introAudio) {
+        const initialPlayback = introAudio.play();
+        if (initialPlayback && typeof initialPlayback.catch === 'function') initialPlayback.catch(() => {});
+      }
 
       document.getElementById('btn-intro-start').addEventListener('click', () => {
         document.getElementById('intro-overlay').classList.add('dismissed');
+        if (introAudio && introAudio.paused) {
+          const playback = introAudio.play();
+          if (playback && typeof playback.catch === 'function') playback.catch(() => {});
+        }
         window.setTimeout(() => cliInput.focus({ preventScroll: true }), 700);
       });
 
